@@ -49,4 +49,12 @@ class ProdutoController {
             println(produto.errors)
         }
     }
+
+    def excluir() {
+        Produto prod = Produto.get(params.id)
+        prod.delete(flush: true)
+
+        def lista = Produto.list()
+        render(template: "/produto/lista", model: [produtos: lista])
+    }
 }

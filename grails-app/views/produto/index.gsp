@@ -8,6 +8,16 @@
         function carregarLista() {
             <g:remoteFunction controller="produto" action="lista" update="divLista" />
         }
+
+        function excluir(id) {
+            if (confirm('Deseja realmente excluir o registro?')) {
+                <g:remoteFunction controller="produto" action="excluir" update="divLista" id="'+id+'" />
+            }
+        }
+
+        function cancelar() {
+            jQuery('#divForm').html("");
+        }
     </script>
 </head>
 <body>
