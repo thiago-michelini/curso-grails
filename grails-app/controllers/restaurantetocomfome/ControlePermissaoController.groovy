@@ -7,9 +7,43 @@ import grails.converters.JSON
 class ControlePermissaoController {
 
     def index() {
-        def listaUsuarios = Usuario.list()
+        render(view: "index")
+    }
+
+    def listarPermissoes() {
         def listaPermissoes = Permissao.list()
-        render(view: "index", model: [usuarios: listaUsuarios, permissoes: listaPermissoes])
+        render(template: "listaPermissoes", model: [permissoes: listaPermissoes])
+    }
+
+    def listarUsuarios() {
+        def listaUsuarios = Usuario.createCriteria().list {
+            order("username")
+        }
+        render(template: "listaUsuarios", model: [usuarios: listaUsuarios])
+    }
+
+    def getPermissao(){
+        Permissao permissao = Permissao.get(params.id)
+        render permissao as JSON
+    }
+
+    def salvarPermissao(){
+        def retorno = [:]
+        Permissao permissao
+        if (params.id){
+            permissao = Permissao.get(params.id)
+        }else{
+            permissao=new Permissao()
+        }
+        permissao.authority = params.permissao
+        permissao.validate()
+        if (!permissao.hasErrors()){
+            permissao.save(flush:true)
+            retorno["mensagem"]="OK"
+        }else{
+            retorno["mensagem"]="ERRO"
+        }
+        render retorno as JSON
     }
 
     def salvarUsuario() {

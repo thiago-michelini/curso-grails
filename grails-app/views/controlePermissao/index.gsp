@@ -29,14 +29,62 @@
     </style>
     <script>
         $(document).ready(function(){
-
+            carregarListaUsuarios();
+            carregarListaPermissoes();
         })
 
+        function carregarListaUsuarios(){
+            $.ajax({
+                method: "POST",
+                url: "listarUsuarios",
+                data: { },
+                success: function(data){
+                    $("#divListaUsuario").html(data)
+                }
+            })
+        }
+
+        function carregarListaPermissoes(){
+            $.ajax({
+                method: "POST",
+                url: "listarPermissoes",
+                data: { },
+                success: function(data){
+                    $("#divListaPermissao").html(data)
+                }
+            })
+        }
+
+        function retornoSalvarPermissao(data){
+            if(data.mensagem=="OK"){
+                $("#divMensagemPermissao").html("Permissão salva com sucesso.")
+                $("#formPermissao input[name=permissao]").val("")
+                $("#formPermissao input[name=id]").val("")
+                carregarListaPermissoes()
+            }else{
+                $("#divMensagemPermissao").html("Não foi possível salvar a permissão.")
+            }
+        }
+
         function retornoSalvarUsuario(data) {
-            if (data.mensagem == "OK")
+            if (data.mensagem == "OK") {
                 $("#divMensagemUsuario").html("Salvo com sucesso.");
-            else
+                carregarListaUsuarios();
+                $("input[name=login]").val("");
+            } else
                 $("#divMensagemUsuario").html("Não foi possível salvar o usuário");
+        }
+
+        function alterarPermissao(id){
+            $.ajax({
+                method: "POST",
+                url: "getPermissao",
+                data: { "id": id },
+                success: function(data){
+                    $("#formPermissao input[name=permissao]").val(data.authority)
+                    $("#formPermissao input[name=id]").val(data.id)
+                }
+            })
         }
     </script>
 </head>
@@ -50,33 +98,19 @@
                 <input type="submit" name="salvar" value="Salvar" />
             </g:formRemote>
         </div>
-        <table>
-            <thead>
-                <th>Nome</th>
-            </thead>
-            <tbody>
-                <g:each in="${usuarios}" var="usuario">
-                    <tr>
-                        <td>${usuario.username}</td>
-                    </tr>
-                </g:each>
-            </tbody>
-        </table>
+        <div id="divListaUsuario"></div>
     </div>
     <div id="divDetalhesUsuario"></div>
     <div id="divPermissoes">
-        <table>
-            <thead>
-                <th>Permissão</th>
-            </thead>
-            <tbody>
-                <g:each in="${permissoes}" var="permissao">
-                    <tr>
-                        <td>${permissao.authority}</td>
-                    </tr>
-                </g:each>
-            </tbody>
-        </table>
+        <div id="divFormPermissao">
+            <div id="divMensagemPermissao"></div>
+            <g:formRemote id="formPermissao" name="formPermissao" url="[controller: 'controlePermissao', action: 'salvarPermissao']" onSuccess="retornoSalvarPermissao(data)">
+                Permissão <input type="text" name="permissao" value="" />
+                <input type="hidden" name="id" />
+                <input type="submit" name="salvar" value="Salvar" />
+            </g:formRemote>
+        </div>
+        <div id="divListaPermissao"></div>
     </div>
 </body>
 </html>
